@@ -14,16 +14,16 @@
 	{		
 		var status = new Parser()
 		.skip(8)
-		.uint8('ID')
-		.uint8('USN')
-		.int16le('MinCellVolt',			{ formatter: (x) => {return x/1000;}})
-		.int16le('MaxCellVolt',			{ formatter: (x) => {return x/1000;}})
-		.uint8('MinCellTemp',			{ formatter: (x) => {return x-40;}}) // temperature ºC
-		.uint8('BypassTemp',			{ formatter: (x) => {return x-40;}}) // temperature ºC
-		.int16le('BypassAmp', 			{ formatter: (x) => {return x/1000;}})
-		.uint8('DataErrorCounter')
-		.uint8('ResetCounter')
-		.uint8('Status') /* Choices NodeStatuses
+		.uint8('Cell_ID')
+		.uint8('Cell_USN')
+		.int16le('Cell_MinCellVolt',			{ formatter: (x) => {return x/1000;}})
+		.int16le('Cell_MaxCellVolt',			{ formatter: (x) => {return x/1000;}})
+		.uint8('Cell_MinCellTemp',			{ formatter: (x) => {return x-40;}}) // temperature ºC
+		.uint8('Cell_BypassTemp',			{ formatter: (x) => {return x-40;}}) // temperature ºC
+		.int16le('Cell_BypassAmp', 			{ formatter: (x) => {return x/1000;}})
+		.uint8('Cell_DataErrorCounter')
+		.uint8('Cell_ResetCounter')
+		.uint8('Cell_Status') /* Choices NodeStatuses
 				None = 0,
 				HighVolt = 1,
 				HighTemp = 2,
@@ -37,22 +37,22 @@
 				MissingSetup = 10,
 				NoConfig = 11,
 				CellOutLimits = 12, */	
-		.uint8('IsOverdue')				// boolean 0 = Off , 1 = On
+		.uint8('Cell_IsOverdue')				// boolean 0 = Off , 1 = On
 
-		.int16le('LoCellVoltAlert',		{ formatter: (x) => {return x/1000;}})
-		.int16le('HiCellVoltAlert',		{ formatter: (x) => {return x/1000;}})
-		.int16le('BypassVoltLevel',		{ formatter: (x) => {return x/1000;}})
-		.int16le('BypassAmpLimit',		{ formatter: (x) => {return x/1000;}})
-		.uint8('BypassTempLimit',		{ formatter: (x) => {return x-40;}}) // temperature ºC
-		.uint8('HiCellTempAlert',		{ formatter: (x) => {return x-40;}}) // temperature ºC
-		.uint8('RawVoltCalOffset')
-		.int16le('FwVers')
-		.int16le('HwVers')
-		.int16le('BootVers')
-		.uint32le('SerialNo')	
-		.uint32le('BypassInitialDate') 	// Epoch
-		.floatle('BypassSessionAh',		{ formatter: (x) => {return x/1000;}}) // Ah
-		.uint8('RepeatCellV')
+		.int16le('Cell_LoCellVoltAlert',		{ formatter: (x) => {return x/1000;}})
+		.int16le('Cell_HiCellVoltAlert',		{ formatter: (x) => {return x/1000;}})
+		.int16le('Cell_BypassVoltLevel',		{ formatter: (x) => {return x/1000;}})
+		.int16le('Cell_BypassAmpLimit',		{ formatter: (x) => {return x/1000;}})
+		.uint8('Cell_BypassTempLimit',		{ formatter: (x) => {return x-40;}}) // temperature ºC
+		.uint8('Cell_HiCellTempAlert',		{ formatter: (x) => {return x-40;}}) // temperature ºC
+		.uint8('Cell_RawVoltCalOffset')
+		.int16le('Cell_FwVers')
+		.int16le('Cell_HwVers')
+		.int16le('Cell_BootVers')
+		.uint32le('Cell_SerialNo')	
+		.uint32le('Cell_BypassInitialDate') 	// Epoch
+		.floatle('Cell_BypassSessionAh',		{ formatter: (x) => {return x/1000;}}) // Ah
+		.uint8('Cell_RepeatCellV')
 		
 		return status.parse(msg);
 	}
