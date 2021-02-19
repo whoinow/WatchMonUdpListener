@@ -91,7 +91,7 @@ function sendInflux(data, tag) {
 	// IF its node based we need to add the node-tag to it as well
 	(config[data.MessageId] && config[data.MessageId].tagID  ) ? tg['nodeID'] =  data[config[data.MessageId].tagID]  : '';
 	
-	influx.writeMeasurement((config[data.MessageId] && config[data.MessageId].serie  ) ? config[data.MessageId].serie: 'generic', [
+	/*influx.writeMeasurement((config[data.MessageId] && config[data.MessageId].serie  ) ? config[data.MessageId].serie: 'generic', [
   	{
 	  tags: tg,
 	  fields: data,
@@ -101,7 +101,7 @@ function sendInflux(data, tag) {
 	}
 
 	
-	);
+	);*/
 };
 
 function errorText(string) {
@@ -176,7 +176,9 @@ server.on('message',function(msg,info){
 	} else {
 		//console.log('Message with message id %s does not exist', payload.MessageId);
 	}
-
+	server.send(message, "18543", "127.0.0.1", (err) => {
+		console.log(err);
+	});
 });
 
 //emits when socket is ready and listening for datagram msgs
@@ -201,5 +203,3 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 server.bind(18542);
-
-
