@@ -91,7 +91,7 @@ function sendInflux(data, tag) {
 	// IF its node based we need to add the node-tag to it as well
 	(config[data.MessageId] && config[data.MessageId].tagID  ) ? tg['nodeID'] =  data[config[data.MessageId].tagID]  : '';
 	
-	/*influx.writeMeasurement((config[data.MessageId] && config[data.MessageId].serie  ) ? config[data.MessageId].serie: 'generic', [
+	influx.writeMeasurement((config[data.MessageId] && config[data.MessageId].serie  ) ? config[data.MessageId].serie: 'generic', [
   	{
 	  tags: tg,
 	  fields: data,
@@ -101,7 +101,7 @@ function sendInflux(data, tag) {
 	}
 
 	
-	);*/
+	);
 };
 
 function errorText(string) {
