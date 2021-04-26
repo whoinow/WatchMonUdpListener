@@ -18,20 +18,47 @@ var fs = require('fs');
 
 //Loading configuration file. 
 try {
-	var config = JSON.parse(fs.readFileSync('config.json', "utf8"));
+	var config = JSON.parse(fs.readFileSync('config/config.json', "utf8"));
 }
 catch (e) {
-	errorText('Could not load configuration file. Will therefore not send any data out. file missing is config.json. Perhaps copy the dist file?'); 
-	console.log(e);
+	errorText('Could not load configuration file. Will therefore not send any data out. file missing is config/config.json. Perhaps copy the dist file?'); 
+	errorText('Dont worry. I copied the file for you now :) But you have to edit and restart'); 
+	if (!fs.existsSync('config')){
+    		fs.mkdirSync('config');
+	}	
+	fs.copyFile('config.json_dist','config/config.json', (err) => {
+		if (err) {
+			console.log("No file copied");
+		}
+		});
+	//console.error(e);
 	var config = {'all':{'mqtt':{},'influx':{}}, 'hej': {}};
+	process.exit(1);
 }
+
+//fs.copyFile('config/config.json','config.json', (err) => {
+//if (err) {
+//	console.log("No file to copy");
+//}
+//});
+
+
+var debug = (config.config.debug) ? config.config.debug : false;
+var debugMQTT = (config.config.debugmqtt) ? config.config.debugmqtt : false;;
+
+
 
 //MQTT server  generally localhost
 var mqtthost = (config.config.mqtthost) ? config.config.mqtthost : 'localhost';
+var mqttenabled = (config.config.mqttenabled) ? config.config.mqttenabled : false;
 var mqttusername = (config.config.mqttusername) ? config.config.mqttusername : '';
 var mqttpassword = (config.config.mqttpassword) ? config.config.mqttpassword : '';
 var influxhost = (config.config.influxhost) ? config.config.influxhost :'localhost';
 var influxdatabase = (config.config.influxdatabase) ? config.config.influxdatabase :'localhost';
+var influxusername = (config.config.influxusername) ? config.config.influxusername : '';
+var influxpassword = (config.config.influxpassword) ? config.config.influxpassword : '';
+var influxenabled = (config.config.influxenabled) ? config.config.influxenabled : false;
+
 
 //Setup MQTT
 options={
@@ -42,34 +69,51 @@ options={
 
 var client  = mqtt.connect('mqtt://' + mqtthost, options)
 
+client.on("error",function(error){
+	console.log("Can't connect to MQTT server" + error);
+	console.log(mqttenabled);
+	if (mqttenabled) { process.exit(1); }
+});
+
+//console.log("connected flag  "+client.connected);
+
+
 const influx = new Influx.InfluxDB({
   host: influxhost,
   database: influxdatabase,
+  port: 8086,
+  username: influxusername,
+  password: influxpassword,
 })
+
+console.log('Influx host set to: ' + influxhost);
+
+influx.ping(5000).then(hosts => {
+  hosts.forEach(host => {
+    if (host.online) {
+      console.log(`${host.url.host} responded in ${host.rtt}ms running ${host.version})`)
+    } else {
+      console.log(`InfluxDB: ${host.url.host} is offline so quitting`)
+      if (influxenabled) process.exit(1);
+    }
+  })
+})
+
+
 
 
 // Function to get payload data
 // input data object
 // output payload data in json form
+const payloadParser = new Parser()
+	.string('first', { encoding: 'utf8', length: 1 })
+	.int16le('MessageId', { formatter: (x) => {return x.toString(16);}})
+	.string('nd', { encoding: 'utf8', length: 1 })
+	.int16le('SystemId')
+	.int16le('hubId');
 function getPayload(data) {
-     var payload = new Parser()
-         .string('first', { encoding: 'ascii', length: 1 })
-         .int16le('MessageId', { formatter: (x) => {return x.toString(16);}})
-         .string('nd', { encoding: 'ascii', length: 1 })
-         .int16le('SystemId')
-         .int16le('hubId')
-	
-	 return payload.parse(data);
+	 return payloadParser.parse(data);
 }
-
-function getArrayObject(msg) {
-
-	obj = Object.assign(payload, eval(messages[payload.MessageId])(msg))
-	
-		
-	return obj;
-}
-
 
 
 
@@ -86,12 +130,13 @@ function sendMqtt(SystemId,MessageId,data) {
 // Function to send data to influx database
 // Input is the data in Json format and a tag to use in influx
 function sendInflux(data, tag) {
+	messageID = data.MessageId.substring(0,2); // So we remove last 2 letters. We dont generally store full message id in config
 	// In config you can set the extra tags and or serie to use. If not set they all go to generic
-	tg = { systemId: data.SystemId, messageId: data.MessageId, messageType: (config[data.MessageId] && config[data.MessageId].tag  ) ? config[data.MessageId].tag: 'generic' };
+	tg = { systemId: data.SystemId, messageId: data.MessageId, messageType: (config[messageID] && config[messageID].tag  ) ? config[messageID].tag: 'generic' };
 	// IF its node based we need to add the node-tag to it as well
-	(config[data.MessageId] && config[data.MessageId].tagID  ) ? tg['nodeID'] =  data[config[data.MessageId].tagID]  : '';
-	
-	influx.writeMeasurement((config[data.MessageId] && config[data.MessageId].serie  ) ? config[data.MessageId].serie: 'generic', [
+	(config[messageID] && config[messageID].tagID  ) ? tg['nodeID'] =  data[config[messageID].tagID]  : '';
+
+	influx.writeMeasurement((config[messageID] && config[messageID].serie  ) ? config[messageID].serie : 'generic', [
   	{
 	  tags: tg,
 	  fields: data,
@@ -133,23 +178,20 @@ console.log('Batrium logger started');
 var messages = {};
 require("fs").readdirSync(normalizedPath).forEach(function(file) {
 	try {
-
-		require("./payload/" + file)();
 		load = file.split("_")[1];
-		messages[load.toLowerCase()] = 'parse_' + load.toLowerCase();
+		messages[load.toLowerCase()] = require("./payload/" + file);
 		infoText('Loaded file: ' + file);
 
 	}
 	catch (e) {
  		errorText('Could not load file: ' + file)
+		console.error(e);
 	}
 });
 
 
 
 // Time to process incomming data
-debug = false;
-debugMQTT = false;
 var tag;
 // Parse new messages incomming from Batrium 
 server.on('message',function(msg,info){
@@ -159,7 +201,7 @@ server.on('message',function(msg,info){
 	if(payload.MessageId in messages) {
 		// If error in message lets try/catch it so we dont rage quit
 		try {
-			obj = Object.assign(payload, eval(messages[payload.MessageId])(msg)); 
+			obj = Object.assign(payload, messages[payload.MessageId](msg));
 			if (debug) console.log(obj);	
 			// check if the message id is present in the config. This dont care what version is there if file exist
 			if (config[messageID] && config[messageID].mqtt || config.all.mqtt) sendMqtt(payload.SystemId,payload.MessageId,obj);
