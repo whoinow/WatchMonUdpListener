@@ -12,12 +12,12 @@
 		"tag" : "general",
 		"serie" : "generic"
 	},
-        "3f" : {
-                "mqtt" : true,
-                "influx" : true,
-                "tag" : "general",
-                "serie" : "generic"
-        },
+	"3f" : {
+			"mqtt" : true,
+			"influx" : true,
+			"tag" : "general",
+			"serie" : "generic"
+	},
 	"78" : {
 		"mqtt" : false,
 		"influx" : true,
