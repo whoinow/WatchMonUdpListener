@@ -18,18 +18,12 @@
 			"tag" : "general",
 			"serie" : "generic"
 	},
-	"78" : {
-		"mqtt" : false,
-		"influx" : true,
-		"info" : "Use influx on message 7857",
+	"41" : {
+		"mqtt" : true,
+		"influx" : false,
 		"tag" : "general",
-		"serie" : "generic"
-	},
-	"57" : {
-		"mqtt" : false,
-		"influx" : true,
-		"tag" : "general",
-		"serie" : "statusfast"
+		"serie" : "nodes2",
+		"info" : "Dont send this message to influx. its not supported. if you need the data stored in influx use MQTT and then parse it first"
 	},
 	"42" : {
 		"mqtt" : false,
@@ -38,21 +32,32 @@
 		"serie" : "nodes",
 		"tagID" : "ID"
 	},
+	"4d" : {
+		"mqtt" : false,
+		"influx" : true,
+		"tag" : "general",
+		"serie" : "generic",
+		"tagID" : "ID"
+	},
 	"54" : {
 		"mqtt" : false,
 		"influx" : true,
 		"tag" : "general",
 		"serie" : "daily"
 	},
-	"41" : {
-		"mqtt" : true,
-		"influx" : false,
+	"57" : {
+		"mqtt" : false,
+		"influx" : true,
 		"tag" : "general",
-		"serie" : "nodes2",
-		"info" : "Dont send this message to influx. its not supported. if you need the data stored in influx use MQTT and then parse it first"
+		"serie" : "statusfast"
 	},
-
-
+	"78" : {
+		"mqtt" : false,
+		"influx" : true,
+		"info" : "Use influx on message 7857",
+		"tag" : "general",
+		"serie" : "generic"
+	},
 	"all" : {
 		"mqtt" : false,
 		"influx" :false,
