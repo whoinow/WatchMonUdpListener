@@ -6,6 +6,12 @@
 		"influxhost" : "localhost",
 		"influxdatabase" : "batrium"
 	},
+	"32" : {
+		"mqtt" : true,
+		"influx" : true,
+		"tag" : "general",
+		"serie" : "generic"
+	},
 	"3e" : {
 		"mqtt" : true,
 		"influx" : true,
@@ -18,6 +24,7 @@
 			"tag" : "general",
 			"serie" : "generic"
 	},
+	
 	"41" : {
 		"mqtt" : true,
 		"influx" : false,
