@@ -26,14 +26,14 @@
 		"info" : "Dont send this message to influx. its not supported. if you need the data stored in influx use MQTT and then parse it first"
 	},
 	"42" : {
-		"mqtt" : false,
+		"mqtt" : true,
 		"influx" : true,
 		"tag" : "general",
 		"serie" : "nodes",
 		"tagID" : "ID"
 	},
 	"4d" : {
-		"mqtt" : false,
+		"mqtt" : true,
 		"influx" : true,
 		"tag" : "general",
 		"serie" : "generic",
