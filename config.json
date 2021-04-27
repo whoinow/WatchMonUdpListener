@@ -58,13 +58,6 @@
 		"tag" : "general",
 		"serie" : "statusfast"
 	},
-	"78" : {
-		"mqtt" : false,
-		"influx" : true,
-		"info" : "Use influx on message 7857",
-		"tag" : "general",
-		"serie" : "generic"
-	},
 	"all" : {
 		"mqtt" : false,
 		"influx" :false,
