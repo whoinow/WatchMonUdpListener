@@ -32,6 +32,13 @@
 		"serie" : "nodes",
 		"tagID" : "ID"
 	},
+	"47" : {
+		"mqtt" : true,
+		"influx" : true,
+		"tag" : "general",
+		"serie" : "generic",
+		"tagID" : "ID"
+	},
 	"4d" : {
 		"mqtt" : true,
 		"influx" : true,
